@@ -94,7 +94,7 @@ class DataTrainingArguments:
     template: Optional[str] = field(
         default=None,
         metadata={
-            "choices": ["chinese_llama_alpaca", "chinese_llama2_alpaca"]
+            "choices": ["llama_alpaca", "llama2_alpaca"]
         }
     )
     

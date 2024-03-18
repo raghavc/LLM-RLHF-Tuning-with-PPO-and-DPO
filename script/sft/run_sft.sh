@@ -1,5 +1,5 @@
 
-pretrained_model=chinese_llama_path
+pretrained_model=llama_path
 dataset_dir=/root/LLM-RLHF-Tuning/sft_data
 data_cache_dir=/root/LLM-RLHF-Tuning/sft_data/cache/data
 lora_trainable="q_proj,v_proj,k_proj,o_proj,gate_proj,down_proj,up_proj"
@@ -9,7 +9,7 @@ modules_to_save=None
 
 torchrun --nnodes 1 --nproc_per_node 1 run_sft_with_peft.py \
     --model_type llama \
-    --template "chinese_llama2_alpaca" \
+    --template "llama2_alpaca" \
     --model_name_or_path ${pretrained_model} \
     --dataset_dir ${dataset_dir} \
     --split_ratio 0.01 \

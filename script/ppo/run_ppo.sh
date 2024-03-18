@@ -1,5 +1,5 @@
 
-sft_model_path=chinese_alpaca_path
+sft_model_path=alpaca_path
 reward_lora_path=rm_lora_path
 actor_peft_path=output_dir_rlhf_actor
 critic_peft_path=output_dir_rlhf_critic
@@ -15,7 +15,7 @@ critic_output_dir=output_dir_rlhf_critic
 
 accelerate launch --config_file default_config.yaml run_ppo_with_peft.py \
     --model_type llama \
-    --template "chinese_llama2_alpaca" \
+    --template "llama2_alpaca" \
     --sft_model_path ${sft_model_path} \
     --reward_lora_path ${reward_lora_path} \
     --dataset_dir ${dataset_dir} \

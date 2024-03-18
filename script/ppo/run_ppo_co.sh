@@ -1,4 +1,4 @@
-sft_model_path=chinese_alpaca_path
+sft_model_path=alpaca_path
 reward_lora_path=rm_lora_path
 peft_path=output_dir_rlhf
 
@@ -10,7 +10,7 @@ output_dir=output_dir_rlhf
 
 accelerate launch --config_file default_config.yaml run_ppo_with_peft.py \
     --model_type llama \
-    --template "chinese_llama2_alpaca" \
+    --template "llama2_alpaca" \
     --use_co_model True \
     --sft_model_path ${sft_model_path} \
     --reward_lora_path ${reward_lora_path} \
