@@ -3,14 +3,14 @@ import torch
 import torch.nn as nn 
 
 PROMPT_TEMPLATE = dict(
-    chinese_llama_alpaca=(
+    llama_alpaca=(
             "Below is an instruction that describes a task. "
             "Write a response that appropriately completes the request.\n\n"
             "### Instruction:\n{instruction}\n\n### Response: "
         ),
-    chinese_llama2_alpaca=(
+    llama2_alpaca=(
         "[INST] <<SYS>>\n"
-        "You are a helpful assistant. 你是一个乐于助人的助手。\n"
+        "You are a helpful assistant.\n"
         "<</SYS>>\n\n{instruction} [/INST]"
     ),
     default=(

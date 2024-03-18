@@ -1,45 +1,58 @@
 # LLM-RLHF-Tuning
 
-本项目从零实现了RLHF三阶段训练，并在文档中详细写了实现细节，欢迎大家交流讨论[WeChat](assets/RLHF讨论群.png)
-
-### 主要内容：
-- 支持指令微调Alpaca模型
-- 支持训练Reward模型
-- 支持PPO算法训练RL模型
-    - 支持基于两个基模型，两个lora的适配器，同时加载RM、SFT、Actor、Critic四个模型，支持accelerate分布式训练 （[PPO算法实现细节](https://zhuanlan.zhihu.com/p/649665766)）
-    - 支持基于一个基模型，两个lora适配器，同时加载RM、SFT、Actor、Critic四个模型，支持accelerate、deepspeed训练
-    - 支持基于一个基模型，一个lora适配器，Actor、Critic共享base model，同时实现RM、SFT、Actor、Critic四个模型功能，支持accelerate、deepspeed训练
-- 支持DPO算法训练模型
-
-### 更新
-- [23/8/23] 支持LLaMA2模型训练；支持DPO训练；支持基于一个基模型、选择一个或两个lora适配器训练PPO、支持accelerate、deepspeed训练
-- [23/8/13] 支持LLaMA模型训练；支持基于两个基模型、两个lora的适配器训练PPO；支持accelerate分布式训练
+This project implements Reinforcement Learning from Human Feedback (RLHF) training from the ground up. It includes detailed documentation of the implementation process and welcomes community discussions and contributions.
 
 
-### 功能
-与开源的RLHF训练框架的功能进行对比
-| 框架               |      SFT Train     |       RM Train     |       PPO Train    |       DPO Train   |
-| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| Our                | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | 
-| [Deepspeed-chat](https://github.com/microsoft/DeepSpeedExamples/tree/master/applications/DeepSpeed-Chat) | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
-| [trl](https://github.com/huggingface/trl)            | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| [MOSS-RLHF](https://github.com/OpenLMLab/MOSS-RLHF)      |                    |                    | :white_check_mark: |                    |
+## Main Features
+
+- **Instruction Fine-Tuning**: Support for fine-tuning the Alpaca model using specific instructions.
+- **Reward Model Training**: Includes functionality to train a reward model effectively.
+- **PPO Algorithm Training**: Offers comprehensive support for training RL models using the Proximal Policy Optimization (PPO) algorithm with various configurations:
+    - Two base models with two LoRA adapters, supporting accelerate distributed training.
+    - A single base model with two LoRA adapters, supporting accelerate and deepspeed training.
+    - A single base model with one LoRA adapter, where Actor and Critic share the base model, also supporting accelerate and deepspeed training.
+- **DPO Algorithm Training**: Support for training models using the DPO algorithm.
+
+## Updates
+
+- **[02/7/2024]** Added support for training LLaMA2 models and DPO training. Introduced PPO training based on a single base model, with an option for one or two LoRA adapters, and included support for accelerate and deepspeed training.
+- **[03/5/13]** Introduced support for LLaMA model training and PPO training based on two base models with two LoRA adapters, along with accelerate distributed training.
+
+## Mathematical Foundations
+
+### Proximal Policy Optimization (PPO)
+
+PPO is an optimization algorithm used in reinforcement learning to update policy parameters by optimizing a clipped surrogate objective function. The objective function $L^{CLIP}(\theta)$ for PPO is defined as:
+
+$$
+L^{CLIP}(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) \cdot \hat{A}_t, \text{clip} \left( r_t(\theta), 1 - \epsilon, 1 + \epsilon \right) \cdot \hat{A}_t \right) \right]
+$$
+
+Where:
+$$r_t(\theta)$$
+- is the ratio of the probability of taking an action under the new policy to that under the old policy.
+$$\hat{A}_t$$ 
+- is the estimated advantage function at time step `t`.
+$$\epsilon $$ 
+- is a hyperparameter representing the clip range.
+
+### Deterministic Policy Optimization (DPO)
+
+DPO is another reinforcement learning algorithm that directly optimizes the deterministic policy to maximize the expected return. It updates the policy parameters $\theta $ by maximizing the expected return $J(\theta)$, given by:
+
+$$
+J(\theta) = \int_{\mathcal{S}} \rho^{\pi}(s) \int_{\mathcal{A}} \pi(s, a; \theta) Q^{\pi}(s, a) \, da \, ds
+$$
+
+Where:
+- $\rho^{\pi}$ is the state-visitation distribution under policy $\pi$.
+- $Q^{\pi}(s, a)$ is the state-action value function.
 
 
-##### PPO Train 
-| 框架               |     Accelerate     |    Deepspeed       |     Multi LORA     |     最低模型参数量 (7B为例) |
-| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | 
-| Our                | :white_check_mark: | :white_check_mark: | :white_check_mark: | single model size ～ 7B | 
-| [Deepspeed-chat](https://github.com/microsoft/DeepSpeedExamples/tree/master/applications/DeepSpeed-Chat) |                    | :white_check_mark: |                    | sft+rm+actor+critic ～ 28B |
-| [trl](https://github.com/huggingface/trl)            | :white_check_mark: |            |             | single model size（not use ref model）～ 7B |
-| [MOSS-RLHF](https://github.com/OpenLMLab/MOSS-RLHF)      | actor model、critic model | sft model、rm model |                    | sft+rm+actor+critic ～ 28B |
 
+To set up your environment for the project, ensure you have the following dependencies installed:
 
-
-## 使用指引
-
-#### 环境搭建
-```
+```bash
 accelerate==0.21.0
 datasets==2.13.1
 scikit-learn==1.3.0
@@ -53,47 +66,9 @@ trl==0.5.0
 deepspeed==0.10.0
 ```
 
-#### 支持模型
-- LLaMA
-- LLaMA2
+## Supported Models
+**LLaMA**
 
-#### 支持训练方式
-- LoRA
-
-## 训练细节
-#### 指令微调模型
-- [训练指南](https://github.com/Joyce94/LLM-RLHF-Tuning/wiki/%E6%8C%87%E4%BB%A4%E5%BE%AE%E8%B0%83%E6%A8%A1%E5%9E%8B)
-
-
-#### 训练奖励模型
-- [训练指南](https://github.com/Joyce94/LLM-RLHF-Tuning/wiki/%E8%AE%AD%E7%BB%83%E5%A5%96%E5%8A%B1%E6%A8%A1%E5%9E%8B)
-
-#### PPO训练
-- 训练指南
-    - [基于两个基模型](https://github.com/Joyce94/LLM-RLHF-Tuning/wiki/PPO%E8%AE%AD%E7%BB%83%E2%80%90%E5%9F%BA%E4%BA%8E%E4%B8%A4%E4%B8%AA%E5%9F%BA%E6%A8%A1%E5%9E%8B)
-        - [PPO算法实现细节](https://zhuanlan.zhihu.com/p/649665766)
-
-    - [基于一个基模型](https://github.com/Joyce94/LLM-RLHF-Tuning/wiki/PPO%E8%AE%AD%E7%BB%83%E2%80%90%E5%9F%BA%E4%BA%8E%E4%B8%80%E4%B8%AA%E5%9F%BA%E6%A8%A1%E5%9E%8B)
-
-#### DPO训练
-- [训练指南](https://github.com/Joyce94/LLM-RLHF-Tuning/wiki/DPO%E8%AE%AD%E7%BB%83)
-
-## TODO
-- [x] 支持LLaMA2模型
-- [x] 支持deepspeed训练
-- [x] 支持DPO训练
-- [ ] PPO提升训练稳定性，实现ppo-max
-- [ ] 支持DDPO训练
-- [ ] 支持[RRHF](https://github.com/GanjinZero/RRHF)
-- [ ] 支持[RAFT](https://github.com/OptimalScale/LMFlow)
-- [ ] 支持拒绝采样 RFT
-- [ ] 支持BLOOM模型
-- [ ] 支持Baichuan模型
-- [ ] 支持QLoRA训练
-
-
-欢迎加群讨论 [WeChat](assets/RLHF讨论群.png)
-
-
-
-
+**LLaMA2**
+## Supported Training Methods
+**LoRA**
