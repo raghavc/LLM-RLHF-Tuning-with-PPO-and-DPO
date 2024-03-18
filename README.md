@@ -38,7 +38,7 @@ $$\epsilon $$
 
 ### Deterministic Policy Optimization (DPO)
 
-DPO is another reinforcement learning algorithm that directly optimizes the deterministic policy to maximize the expected return. It updates the policy parameters $\theta $ by maximizing the expected return $J(\theta)$, given by:
+DPO is another reinforcement learning algorithm that directly optimizes the deterministic policy to maximize the expected return. It updates the policy parameters $\theta$ by maximizing the expected return $J(\theta)$, given by:
 
 $$
 J(\theta) = \int_{\mathcal{S}} \rho^{\pi}(s) \int_{\mathcal{A}} \pi(s, a; \theta) Q^{\pi}(s, a) \, da \, ds
