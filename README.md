@@ -16,7 +16,7 @@ This project implements Reinforcement Learning from Human Feedback (RLHF) traini
 ## Updates
 
 - **[02/7/2024]** Added support for training LLaMA2 models and DPO training. Introduced PPO training based on a single base model, with an option for one or two LoRA adapters, and included support for accelerate and deepspeed training.
-- **[03/5/13]** Introduced support for LLaMA model training and PPO training based on two base models with two LoRA adapters, along with accelerate distributed training.
+- **[03/5/2024]** Introduced support for LLaMA model training and PPO training based on two base models with two LoRA adapters, along with accelerate distributed training.
 
 ## Mathematical Foundations
 
