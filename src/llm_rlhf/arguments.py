@@ -39,3 +39,22 @@ class DataArguments:
         if bool(self.dataset_name) == bool(self.train_file):
             raise ValueError("Set exactly one of dataset_name or train_file.")
         if self.eval_file and not self.train_file:
+            raise ValueError("eval_file can only be used with train_file.")
+        if not 0.0 < self.test_size < 1.0:
+            raise ValueError("test_size must be between 0 and 1.")
+
+
+@dataclass
+class OnlineArguments:
+    """Reward sources shared by GRPO and RLOO."""
+
+    reward_model_name_or_path: str | None = field(
+        default=None,
+        metadata={"help": "Optional scalar reward-model checkpoint."},
+    )
+    reward_functions: list[str] = field(
+        default_factory=lambda: ["exact_answer", "format", "soft_length"],
+        metadata={
+            "help": "Built-in reward names or dotted callable paths. Built-ins: exact_answer, format, soft_length."
+        },
+    )
