@@ -46,3 +46,27 @@ def load_training_datasets(
             data_args.dataset_name,
             name=data_args.dataset_config,
             streaming=data_args.streaming,
+        )
+
+    dataset = _rename_columns(dataset, data_args.column_map)
+    if data_args.train_split not in dataset:
+        raise ValueError(f"Training split '{data_args.train_split}' was not found. Available splits: {list(dataset)}")
+
+    train_dataset = dataset[data_args.train_split]
+    eval_dataset = dataset.get(data_args.eval_split) if require_eval else None
+
+    if require_eval and eval_dataset is None:
+        if data_args.streaming:
+            raise ValueError("Streaming datasets need an explicit evaluation split or eval_file.")
+        split = train_dataset.train_test_split(test_size=data_args.test_size, seed=42)
+        train_dataset, eval_dataset = split["train"], split["test"]
+
+    validate_schema(train_dataset, schema)
+    if eval_dataset is not None:
+        validate_schema(eval_dataset, schema)
+    return train_dataset, eval_dataset
+
+
+def _rename_columns(dataset: DatasetCollection, column_map: dict[str, str]) -> DatasetCollection:
+    if not column_map:
+        return dataset
