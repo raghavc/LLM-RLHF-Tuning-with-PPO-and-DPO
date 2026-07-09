@@ -70,3 +70,26 @@ def load_training_datasets(
 def _rename_columns(dataset: DatasetCollection, column_map: dict[str, str]) -> DatasetCollection:
     if not column_map:
         return dataset
+    missing = set(column_map) - set(next(iter(dataset.values())).column_names)
+    if missing:
+        raise ValueError(f"Columns requested by column_map were not found: {sorted(missing)}")
+    return dataset.rename_columns(column_map)
+
+
+def validate_schema(dataset: DatasetLike, schema: str) -> None:
+    """Fail early with a useful error when a dataset does not match a trainer."""
+
+    columns = set(dataset.column_names)
+    accepted: dict[str, tuple[frozenset[str], ...]] = {
+        "sft": (frozenset({"messages"}), frozenset({"text"}), frozenset({"prompt", "completion"})),
+        "preference": (frozenset({"chosen", "rejected"}),),
+        "kto": (frozenset({"prompt", "completion", "label"}),),
+        "online": (frozenset({"prompt"}),),
+        "ppo": (frozenset({"prompt"}),),
+    }
+    if schema not in accepted:
+        raise ValueError(f"Unknown dataset schema: {schema}")
+    if any(required <= columns for required in accepted[schema]):
+        return
+    expected = " or ".join("{" + ", ".join(sorted(group)) + "}" for group in accepted[schema])
+    raise ValueError(f"Dataset for {schema} must contain {expected}; found {sorted(columns)}")
