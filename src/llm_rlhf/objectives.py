@@ -47,3 +47,26 @@ def dpo_loss(
     metrics = {
         "chosen_rewards": chosen_rewards,
         "rejected_rewards": rejected_rewards,
+        "reward_accuracy": (chosen_rewards > rejected_rewards).float().mean(),
+        "reward_margin": (chosen_rewards - rejected_rewards).mean(),
+    }
+    return -F.logsigmoid(logits).mean(), metrics
+
+
+def group_relative_advantages(rewards: torch.Tensor, scale: bool = True, epsilon: float = 1e-4) -> torch.Tensor:
+    """Center rewards within each prompt group, with optional GRPO scaling."""
+
+    centered = rewards - rewards.mean(dim=-1, keepdim=True)
+    if not scale:
+        return centered
+    return centered / (rewards.std(dim=-1, keepdim=True, unbiased=False) + epsilon)
+
+
+def leave_one_out_advantages(rewards: torch.Tensor) -> torch.Tensor:
+    """Compute the RLOO baseline from the other samples in each group."""
+
+    group_size = rewards.shape[-1]
+    if group_size < 2:
+        raise ValueError("RLOO requires at least two generations per prompt.")
+    baseline = (rewards.sum(dim=-1, keepdim=True) - rewards) / (group_size - 1)
+    return rewards - baseline
