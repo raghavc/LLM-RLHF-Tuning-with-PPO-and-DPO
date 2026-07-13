@@ -54,3 +54,32 @@ def normalize_answer(answer: Any) -> str:
     text = re.sub(r"^(the answer is|answer:)\s*", "", text)
     text = text.strip(" .$`\n\t")
     try:
+        return format(Decimal(text).normalize(), "f")
+    except InvalidOperation:
+        return re.sub(r"\s+", " ", text)
+
+
+def exact_answer_reward(completions: list[Any], answer: list[Any], **_: Any) -> list[float]:
+    """Return one for an exact normalized answer and zero otherwise."""
+
+    return [
+        float(normalize_answer(extract_final_answer(completion_text(completion))) == normalize_answer(target))
+        for completion, target in zip(completions, answer, strict=True)
+    ]
+
+
+def format_reward(completions: list[Any], **_: Any) -> list[float]:
+    """Reward an explicit reasoning and final-answer boundary."""
+
+    return [float(bool(_STRICT_FORMAT.fullmatch(completion_text(completion)))) for completion in completions]
+
+
+def soft_length_reward(completions: list[Any], **kwargs: Any) -> list[float]:
+    """Apply no brevity bonus and a bounded penalty beyond a soft limit."""
+
+    soft_limit = int(kwargs.get("soft_length_limit", 512))
+    hard_limit = max(int(kwargs.get("hard_length_limit", 1024)), soft_limit + 1)
+    rewards = []
+    for completion in completions:
+        length = len(completion_text(completion).split())
+        overflow = max(length - soft_limit, 0)
