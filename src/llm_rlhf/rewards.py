@@ -83,3 +83,30 @@ def soft_length_reward(completions: list[Any], **kwargs: Any) -> list[float]:
     for completion in completions:
         length = len(completion_text(completion).split())
         overflow = max(length - soft_limit, 0)
+        rewards.append(-min(overflow / (hard_limit - soft_limit), 1.0))
+    return rewards
+
+
+BUILTIN_REWARDS: dict[str, RewardFunction] = {
+    "exact_answer": exact_answer_reward,
+    "format": format_reward,
+    "soft_length": soft_length_reward,
+}
+
+
+def resolve_reward_functions(names: list[str], reward_model: str | None = None) -> list[RewardFunction | str]:
+    rewards: list[RewardFunction | str] = [reward_model] if reward_model else []
+    for name in names:
+        if name in BUILTIN_REWARDS:
+            rewards.append(BUILTIN_REWARDS[name])
+            continue
+        if "." not in name:
+            raise ValueError(f"Unknown reward function '{name}'. Built-ins: {sorted(BUILTIN_REWARDS)}")
+        module_name, function_name = name.rsplit(".", 1)
+        function = getattr(importlib.import_module(module_name), function_name)
+        if not callable(function):
+            raise TypeError(f"Reward target '{name}' is not callable.")
+        rewards.append(function)
+    if not rewards:
+        raise ValueError("Configure at least one reward model or reward function.")
+    return rewards
