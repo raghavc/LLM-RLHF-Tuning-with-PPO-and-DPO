@@ -14,3 +14,19 @@ def main() -> None:
     train_dataset, eval_dataset = load_training_datasets(
         data_args,
         require_eval=wants_evaluation(training_args),
+        schema="sft",
+    )
+    trainer = SFTTrainer(
+        model=model_args.model_name_or_path,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        quantization_config=get_quantization_config(model_args),
+        peft_config=get_peft_config(model_args),
+    )
+    trainer.train()
+    save_trainer(trainer, training_args.output_dir, data_args.dataset_name)
+
+
+if __name__ == "__main__":
+    main()
