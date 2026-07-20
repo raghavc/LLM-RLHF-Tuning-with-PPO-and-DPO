@@ -60,3 +60,33 @@ def main() -> None:
     value_model = AutoModelForSequenceClassification.from_pretrained(
         training_args.reward_model_path,
         num_labels=1,
+        **model_kwargs,
+    )
+    reward_model = AutoModelForSequenceClassification.from_pretrained(
+        training_args.reward_model_path,
+        num_labels=1,
+        **model_kwargs,
+    )
+    policy = AutoModelForCausalLM.from_pretrained(training_args.sft_model_path, **model_kwargs)
+    expected_vocab_size = len(tokenizer)
+    for name, model in (("policy", policy), ("reward", reward_model), ("value", value_model)):
+        if model.config.vocab_size != expected_vocab_size:
+            raise ValueError(
+                f"The {name} model vocabulary ({model.config.vocab_size}) does not match the tokenizer "
+                f"({expected_vocab_size}). PPO requires one shared token vocabulary."
+            )
+    peft_config = get_peft_config(model_args)
+    ref_policy = None
+    if peft_config is None:
+        ref_policy = AutoModelForCausalLM.from_pretrained(training_args.sft_model_path, **model_kwargs)
+
+    max_positions = getattr(policy.config, "max_position_embeddings", 2048)
+    max_prompt_length = min(1024, max_positions - training_args.response_length)
+    if max_prompt_length < 1:
+        raise ValueError("response_length must be smaller than the policy context window.")
+
+    with PartialState().local_main_process_first():
+        train_dataset = _tokenize_prompts(
+            train_dataset,
+            tokenizer,
+            training_args.dataset_num_proc,
