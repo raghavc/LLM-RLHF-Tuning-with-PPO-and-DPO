@@ -90,3 +90,33 @@ def main() -> None:
             train_dataset,
             tokenizer,
             training_args.dataset_num_proc,
+            max_prompt_length,
+        )
+        if eval_dataset is not None:
+            eval_dataset = _tokenize_prompts(
+                eval_dataset,
+                tokenizer,
+                training_args.dataset_num_proc,
+                max_prompt_length,
+            )
+
+    trainer = PPOTrainer(
+        args=training_args,
+        processing_class=tokenizer,
+        model=policy,
+        ref_model=ref_policy,
+        reward_model=reward_model,
+        value_model=value_model,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        peft_config=peft_config,
+    )
+    trainer.train()
+    trainer.save_model(training_args.output_dir)
+    trainer.accelerator.print(f"Training complete. Model saved to {training_args.output_dir}.")
+    if training_args.push_to_hub:
+        trainer.push_to_hub(dataset_name=data_args.dataset_name)
+
+
+if __name__ == "__main__":
+    main()
