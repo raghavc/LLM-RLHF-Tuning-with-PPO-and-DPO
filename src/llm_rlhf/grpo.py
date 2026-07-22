@@ -18,3 +18,21 @@ def main() -> None:
         schema="online",
     )
     rewards = resolve_reward_functions(
+        online_args.reward_functions,
+        online_args.reward_model_name_or_path,
+    )
+    trainer = GRPOTrainer(
+        model=model_args.model_name_or_path,
+        reward_funcs=rewards,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        quantization_config=get_quantization_config(model_args),
+        peft_config=get_peft_config(model_args),
+    )
+    trainer.train()
+    save_trainer(trainer, training_args.output_dir, data_args.dataset_name)
+
+
+if __name__ == "__main__":
+    main()
