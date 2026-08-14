@@ -1,0 +1,2 @@
+{"messages":[{"role":"user","content":"Explain why the sky appears blue in two sentences."},{"role":"assistant","content":"Air molecules scatter shorter blue wavelengths of sunlight more strongly than longer red wavelengths. This Rayleigh scattering sends blue light toward our eyes from across the sky."}]}
+{"messages":[{"role":"user","content":"Write a Python function that returns the square of a number."},{"role":"assistant","content":"def square(value):\n    return value * value"}]}
