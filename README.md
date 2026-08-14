@@ -78,7 +78,7 @@ The recipes target a recent NVIDIA GPU with bfloat16 support. For a CPU parser o
 PPO constrains policy updates with a clipped likelihood ratio:
 
 $$
-L^{\text{CLIP}}(\theta) = \mathbb{E}_t\left[\min\left(r_t(\theta)\hat{A}_t,\operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right)\right]
+L^{\text{CLIP}}(\theta) = \mathbb{E}_t\left[\min\left(r_t(\theta)\hat{A}_t,\mathrm{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right)\right]
 $$
 
 where $r_t(\theta)=\pi_\theta(a_t\mid s_t)/\pi_{\theta_{\text{old}}}(a_t\mid s_t)$ and $\hat{A}_t$ is an advantage estimate. The complete trainer is in `llm_rlhf.ppo`; the small, inspectable loss is in `llm_rlhf.objectives`.
@@ -98,7 +98,7 @@ The reference policy regularizes the update, while $\beta$ controls the strength
 GRPO samples a group of completions for each prompt and forms relative advantages without a learned value model:
 
 $$
-\hat{A}_i = \frac{r_i-\operatorname{mean}(r_1,\ldots,r_G)}{\operatorname{std}(r_1,\ldots,r_G)+\epsilon}
+\hat{A}_i = \frac{r_i-\mathrm{mean}(r_1,\ldots,r_G)}{\mathrm{std}(r_1,\ldots,r_G)+\epsilon}
 $$
 
 The 2.0 GRPO recipe uses the DAPO token-level loss, asymmetric clipping, truncated-completion masking, and no group standard-deviation scaling. These choices address length and prompt-difficulty biases identified after the original GRPO formulation.
