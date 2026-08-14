@@ -4,8 +4,7 @@ This project implements the major stages of language-model post-training with cl
 
 ## Version 2.0
 
-Version 2.0 replaces the 2023-era training stack with Transformers 5, TRL 1, PEFT, Accelerate, and Qwen3 examples. It also corrects the original documentation: DPO in this project means **Direct Preference Optimization**, not Deterministic Policy Optimization.
-
+Version 2.0 replaces the 2023-era training stack with Transformers 5, TRL 1, PEFT, Accelerate, and Qwen3 examples. I
 The release adds:
 
 - **Supervised Fine-Tuning**: Conversational and prompt-completion datasets, sequence packing, LoRA, rank-stabilized LoRA, and optional QLoRA.
