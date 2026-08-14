@@ -1,0 +1,42 @@
+model_name_or_path: Qwen/Qwen3-0.6B
+dataset_name: openai/gsm8k
+dataset_config: main
+train_split: train
+eval_split: test
+column_map:
+  question: prompt
+reward_functions:
+  - exact_answer
+  - soft_length
+reward_weights:
+  - 1.0
+  - 0.05
+output_dir: outputs/qwen3-grpo
+use_peft: true
+use_rslora: true
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target_modules: all-linear
+dtype: bfloat16
+bf16: true
+learning_rate: 0.000005
+max_steps: 1000
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+num_generations: 4
+max_completion_length: 768
+temperature: 0.9
+beta: 0.02
+loss_type: dapo
+scale_rewards: none
+epsilon: 0.2
+epsilon_high: 0.28
+mask_truncated_completions: true
+eval_strategy: steps
+eval_steps: 100
+save_steps: 100
+logging_steps: 10
+report_to: none

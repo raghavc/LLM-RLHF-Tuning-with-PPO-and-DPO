@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "llm-rlhf-tuning"
+version = "2.0.0"
+description = "Modern, research-oriented LLM post-training with PPO, DPO, KTO, GRPO, RLOO, reward modeling, and SFT."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "accelerate==1.14.0",
+    "datasets==5.0.1",
+    "peft==0.20.0",
+    "pyyaml>=6.0.2,<7",
+    "torch==2.13.0",
+    "transformers==5.14.1",
+    "trl==1.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<10",
+    "ruff>=0.12,<1",
+]
+quantization = [
+    "bitsandbytes>=0.46,<1",
+]
+tracking = [
+    "trackio>=0.5,<1",
+    "wandb>=0.19,<1",
+]
+
+[project.scripts]
+llm-rlhf-sft = "llm_rlhf.sft:main"
+llm-rlhf-reward = "llm_rlhf.reward:main"
+llm-rlhf-ppo = "llm_rlhf.ppo:main"
+llm-rlhf-dpo = "llm_rlhf.dpo:main"
+llm-rlhf-kto = "llm_rlhf.kto:main"
+llm-rlhf-grpo = "llm_rlhf.grpo:main"
+llm-rlhf-rloo = "llm_rlhf.rloo:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/llm_rlhf"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
