@@ -1,0 +1,31 @@
+model_name_or_path: Qwen/Qwen3-0.6B
+dataset_name: trl-lib/tldr-preference
+train_split: train
+eval_split: validation
+test_size: 0.02
+output_dir: outputs/qwen3-reward
+use_peft: true
+lora_task_type: SEQ_CLS
+use_rslora: true
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target_modules: all-linear
+lora_modules_to_save:
+  - score
+dtype: bfloat16
+bf16: true
+learning_rate: 0.0001
+num_train_epochs: 1
+per_device_train_batch_size: 2
+per_device_eval_batch_size: 2
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+max_length: 2048
+center_rewards_coefficient: 0.01
+eval_strategy: steps
+eval_steps: 100
+save_steps: 100
+logging_steps: 10
+warmup_ratio: 0.03
+report_to: none
