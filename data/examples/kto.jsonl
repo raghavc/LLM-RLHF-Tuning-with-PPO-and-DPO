@@ -1,0 +1,2 @@
+{"prompt":[{"role":"user","content":"What is the capital of Japan?"}],"completion":[{"role":"assistant","content":"Tokyo is the capital of Japan."}],"label":true}
+{"prompt":[{"role":"user","content":"What is the capital of Japan?"}],"completion":[{"role":"assistant","content":"Kyoto is the capital of Japan."}],"label":false}
