@@ -1,0 +1,2 @@
+{"prompt":[{"role":"user","content":"What is 12 multiplied by 8?"}],"chosen":[{"role":"assistant","content":"12 multiplied by 8 is 96."}],"rejected":[{"role":"assistant","content":"12 multiplied by 8 is 86."}]}
+{"prompt":[{"role":"user","content":"Give one practical way to reduce household energy use."}],"chosen":[{"role":"assistant","content":"Replace frequently used incandescent bulbs with efficient LED bulbs."}],"rejected":[{"role":"assistant","content":"Leave lights on so they do not need to warm up again."}]}
