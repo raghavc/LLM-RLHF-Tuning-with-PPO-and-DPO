@@ -21,3 +21,25 @@ def test_dpo_loss_rewards_better_policy_preference() -> None:
         beta=1.0,
     )
     neutral_loss, _ = dpo_loss(
+        torch.tensor([1.0]),
+        torch.tensor([1.0]),
+        torch.tensor([1.0]),
+        torch.tensor([1.0]),
+        beta=1.0,
+    )
+    assert good_loss < neutral_loss
+    assert metrics["reward_accuracy"].item() == 1.0
+
+
+def test_group_relative_advantages_are_centered() -> None:
+    rewards = torch.tensor([[1.0, 2.0, 3.0]])
+    advantages = group_relative_advantages(rewards)
+    assert advantages.mean().item() == pytest.approx(0.0, abs=1e-6)
+
+
+def test_leave_one_out_advantages() -> None:
+    rewards = torch.tensor([[1.0, 2.0, 4.0]])
+    advantages = leave_one_out_advantages(rewards)
+    assert advantages.tolist()[0] == pytest.approx([-2.0, -0.5, 2.5])
+    with pytest.raises(ValueError, match="at least two"):
+        leave_one_out_advantages(torch.tensor([[1.0]]))
