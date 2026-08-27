@@ -38,3 +38,42 @@ The `label` field must be boolean. Check the desirable-to-undesirable ratio and 
 Online trainers require `prompt`. Built-in exact-answer rewards also require `answer`:
 
 ```json
+{"prompt":"A box has 7 rows of 6 pencils. How many pencils are there?","answer":"42"}
+```
+
+The exact-answer extractor recognizes `<answer>...</answer>`, `\boxed{...}`, GSM8K's `#### ...` convention, and finally the last non-empty line. For new datasets, prefer an explicit answer boundary.
+
+The format reward expects the full completion to use:
+
+```text
+<think>reasoning</think>
+<answer>final answer</answer>
+```
+
+Only use a format reward when the prompt or chat template asks for this structure. Otherwise the reward will be uninformative.
+
+## PPO
+
+PPO requires a `prompt` column. Its reward checkpoint must share the policy tokenizer and vocabulary because the current trainer scores policy token IDs directly with the reward and value models.
+
+## Column Mapping
+
+Rename source columns in YAML without preprocessing a new copy:
+
+```yaml
+column_map:
+  question: prompt
+  solution: answer
+```
+
+Mapping runs before schema validation and applies to every split.
+
+## Local Files
+
+```yaml
+train_file: data/examples/preference.jsonl
+eval_file: null
+test_size: 0.25
+```
+
+Supported extensions are `.json`, `.jsonl`, `.csv`, `.tsv`, `.parquet`, `.txt`, and `.text`. Train and evaluation files must use the same format.
