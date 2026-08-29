@@ -15,3 +15,20 @@ Version 2.0 is a deliberate API break. The previous code targeted Transformers 4
 | No equivalent | `python -m llm_rlhf.rloo --config configs/rloo.yaml` |
 
 ## Configuration Changes
+
+- `model_type` is removed. Transformers Auto classes select the architecture from the checkpoint.
+- `load_in_4bit` remains available through `ModelConfig`; install the `quantization` extra first.
+- `lora_rank` becomes `lora_r`.
+- `lora_target` becomes `lora_target_modules`. The recipes use `all-linear` to avoid LLaMA-specific module lists.
+- `dpo_beta` becomes `beta`.
+- `max_prompt_length` and `max_response_length` become the trainer-specific `max_length` or `max_completion_length` settings.
+- Dataset templates are replaced by tokenizer chat templates and canonical dataset schemas.
+- `wandb` is optional. Set `report_to: wandb` and install the `tracking` extra when needed.
+
+## PPO Changes
+
+PPO still has an end-to-end trainer, but it is an experimental API in TRL 1.9. The policy, reference, reward, and value models are now explicit, and the recipe uses the lower-variance `k3` KL estimator. For new online-RL experiments, compare PPO against RLOO and GRPO-family objectives rather than treating PPO as the only baseline.
+
+## Reproducing Version 1
+
+The old implementation remains available in Git history before the 2.0 commit. Use a separate environment with the original `requirements.txt`; do not mix the version 1 and version 2 dependencies.
